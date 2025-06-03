@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Custom Colors */
+  --primary: #fb6000;
+  --primary-gradient: linear-gradient(180deg, #ff9f64 0%, #fb6000 100%);
+
+  --light-gray: #e8e8e8;
+  --demin-primary-50: #e9f2f6;
+  --demin-primary-100: #b8d3e3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-geist-sans: var(--font-geist-sans);
+
+  /* Custom Colors */
+  --color-primary: var(--primary);
+  --color-primary-gradient: var(--primary-gradient);
+  --color-light-gray: var(--light-gray);
+  --color-demin-primary-50: var(--demin-primary-50);
+  --color-demin-primary-100: var(--demin-primary-100);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans);
+}
+
+/* Hide Scrollbar */
+.scroll-hide {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+.scroll-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.border-red {
+  @apply border border-red-500;
+}
+
+/* --------- Custom Utilities ----------- */
+
+.flex-center-start {
+  @apply flex items-center justify-start;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-center-between {
+  @apply flex items-center justify-between;
+}
+
+.flex-center-end {
+  @apply flex items-center justify-end;
+}
+
+.flex-start-between {
+  @apply flex items-start justify-between;
+}
+
+.flex-center-start {
+  @apply flex items-center justify-start;
+}
+
+.flex-start-start {
+  @apply flex items-start justify-start;
+}
+
+.flex-stretch-between {
+  @apply flex items-stretch justify-between;
+}
+
+.flex-stretch-start {
+  @apply flex items-stretch justify-start;
+}
+
+/* Ant design override */
+.ant-modal-close-icon * {
+  fill: black !important;
+}
+
+.ant-table-cell {
+  font-weight: 500;
+}
+
+.ant-form-item-label label {
+  font-weight: 500;
+}
+
+.ant-popconfirm-description {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+
+.ant-tabs-tab-btn {
+  font-weight: 500;
+}
+
+.ant-input {
+  font-weight: 450 !important;
+}
+
+.ant-otp input {
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+}
+
+.antd-col {
+  box-sizing: border-box;
+}
+
+.ant-tag {
+  font-family: var(--font-dm-sans) !important;
+  border-radius: 9999px !important;
+  padding-inline: 12px !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
+
+.ant-upload-wrapper {
+  width: 100% !important;
+}
+.ant-upload-select {
+  width: 100% !important;
+}
+
+.ant-menu-title-content a {
+  transition: none !important;
+  font-size: 1.2rem !important;
+}
