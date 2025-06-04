@@ -1,71 +1,58 @@
 "use client";
 
-import { Input, Table, TableProps } from "antd";
+import { Flex, Input, Table, TableProps } from "antd";
 import { Tooltip } from "antd";
 import { ConfigProvider } from "antd";
-import { Search } from "lucide-react";
-import userImage from "@/assets/images/user-avatar-lg.png";
+import { UserCheck } from "lucide-react";
 import { Eye } from "lucide-react";
 import { UserX } from "lucide-react";
 import { useState } from "react";
 import { Filter } from "lucide-react";
-import Image, { StaticImageData } from "next/image";
 import CustomConfirm from "@/components/custom/CustomConfirm";
-import { message } from "antd";
 import ProfileModal from "@/components/shared-modals/ProfileModal";
 import { Tag } from "antd";
 import getTagColor from "@/utils/getTagColor";
-
-interface AccountDetailsData {
-  key: number;
-  name: string;
-  userImg: StaticImageData;
-  email: string;
-  contact: string;
-  date: string;
-  accountType: string;
-}
-
-// Dummy table Data
-const data: AccountDetailsData[] = Array.from({ length: 10 }).map((_, inx) => ({
-  key: inx + 1,
-  name: "Soumaya",
-  userImg: userImage,
-  email: "soumaya@gmail.com",
-  contact: "+1 (234) 567-890",
-  date: "Oct 24 2024, 11:10 PM",
-  accountType: inx % 2 === 0 ? "Vendor" : "User",
-}));
+import {
+  useGetAllUsersQuery,
+  useToggleUserStatusMutation,
+} from "@/redux/features/user/usersApi";
+import { IUser } from "@/types";
+import CustomAvatar from "@/components/custom/CustomAvatar";
+import dayjs from "dayjs";
+import catchAsync from "@/utils/catchAsync";
+import { toast } from "sonner";
+const { Search } = Input;
 
 export default function AccountDetailsTable() {
-  const [, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 
-  // Block user handler
-  const handleBlockUser = () => {
-    message.success("User blocked successfully");
+  // Get all users
+  const { data: usersRes, isLoading: usersLoading } = useGetAllUsersQuery({
+    limit: "999999",
+    searchTerm: searchText,
+  });
+  const users = usersRes?.data?.data || [];
+  console.log({ users });
+
+  // User status update handle
+  const [toggleUserStatus] = useToggleUserStatusMutation();
+  const handleToggleStatus = (userId: string) => {
+    catchAsync(async () => {
+      await toggleUserStatus(userId).unwrap();
+      toast.success("User status updated successfully!");
+    });
   };
 
   // ================== Table Columns ================
-  const columns: TableProps<AccountDetailsData>["columns"] = [
-    {
-      title: "Serial",
-      dataIndex: "key",
-      render: (value) => `#${value}`,
-    },
+  const columns: TableProps<IUser>["columns"] = [
     {
       title: "Name",
-      dataIndex: "name",
-      render: (value, record) => (
+      render: (_, record) => (
         <div className="flex-center-start gap-x-2">
-          <Image
-            src={record.userImg}
-            alt="User avatar"
-            width={1200}
-            height={1200}
-            className="aspect-square h-auto w-10 rounded-full"
-          />
-          <p className="font-medium">{value}</p>
+          <CustomAvatar size={30} src={record?.profile} name={record?.name} />
+          <p className="font-medium">{record?.name}</p>
         </div>
       ),
     },
@@ -75,24 +62,33 @@ export default function AccountDetailsTable() {
     },
     {
       title: "Contact",
-      dataIndex: "contact",
+      dataIndex: "phoneNumber",
+      render(value) {
+        return value || "N/A";
+      },
     },
     {
       title: "Registered At",
-      dataIndex: "date",
+      dataIndex: "createdAt",
+      render(value) {
+        return dayjs(value).format("YYYY-MM-DD hh:mm A");
+      },
     },
     {
       title: "Account Type",
-      dataIndex: "accountType",
-
+      dataIndex: "role",
       filters: [
         {
           text: "User",
-          value: "User",
+          value: "user",
         },
         {
           text: "Vendor",
-          value: "Vendor",
+          value: "vendor",
+        },
+        {
+          text: "Admin",
+          value: "admin",
         },
       ],
       filterIcon: () => (
@@ -102,32 +98,82 @@ export default function AccountDetailsTable() {
           className="flex items-start justify-start"
         />
       ),
-      onFilter: (value, record) =>
-        record.accountType.indexOf(value as string) === 0,
+      onFilter: (value, record) => record.role.indexOf(value as string) === 0,
+      render: (value) => (
+        <Tag color={getTagColor(value)} className="capitalize">
+          {value}
+        </Tag>
+      ),
+    },
 
-      render: (value) => <Tag color={getTagColor(value)}>{value}</Tag>,
+    {
+      title: "Status",
+      dataIndex: "status",
+      filters: [
+        {
+          text: "Active",
+          value: "active",
+        },
+        {
+          text: "Blocked",
+          value: "blocked",
+        },
+      ],
+      filterIcon: () => (
+        <Filter
+          size={18}
+          color="#fff"
+          className="flex items-start justify-start"
+        />
+      ),
+      onFilter: (value, record) => record.status.indexOf(value as string) === 0,
+      render(value) {
+        return (
+          <Tag color={getTagColor(value)} className="capitalize">
+            {value}
+          </Tag>
+        );
+      },
     },
     {
       title: "Action",
-      render: () => (
+      render: (_, record) => (
         <div className="flex-center-start gap-x-3">
           <Tooltip title="Show Details">
-            <button onClick={() => setProfileModalOpen(true)}>
+            <button
+              onClick={() => {
+                setProfileModalOpen(true);
+                setSelectedUser(record);
+              }}
+            >
               <Eye color="var(--primary)" size={22} />
             </button>
           </Tooltip>
-
-          <CustomConfirm
-            title="Block User"
-            description="Are you sure to block this user?"
-            onConfirm={handleBlockUser}
-          >
-            <Tooltip title="Block User">
-              <button>
-                <UserX color="#F16365" size={22} />
-              </button>
-            </Tooltip>
-          </CustomConfirm>
+          {record?.status === "active" ? (
+            <CustomConfirm
+              title="Block User"
+              description="Are you sure to block this user?"
+              onConfirm={() => handleToggleStatus(record?._id)}
+            >
+              <Tooltip title="Block User">
+                <button>
+                  <UserX color="#F16365" size={22} />
+                </button>
+              </Tooltip>
+            </CustomConfirm>
+          ) : (
+            <CustomConfirm
+              title="Unblock User"
+              description="Are you sure to unblock this user?"
+              onConfirm={() => handleToggleStatus(record?._id)}
+            >
+              <Tooltip title="Block User">
+                <button>
+                  <UserCheck color="green" size={22} />
+                </button>
+              </Tooltip>
+            </CustomConfirm>
+          )}
         </div>
       ),
     },
@@ -144,25 +190,36 @@ export default function AccountDetailsTable() {
     >
       <div className="flex-center-between mb-3">
         <h3 className="text-2xl font-bold">Account Details</h3>
-        <div className="w-1/3">
-          <Input
-            placeholder="Search by name or email"
-            prefix={<Search className="mr-2 text-black" size={20} />}
-            className="h-11 !rounded-lg !border !text-base"
-            onChange={(e) => setSearchText(e.target.value)}
+        <Flex justify="end" gap={10} align="center" className="h-full w-1/3">
+          <Search
+            placeholder="Search users..."
+            onSearch={(value) => setSearchText(value)}
+            size="large"
+            style={{
+              width: 300,
+            }}
+            allowClear
           />
-        </div>
+        </Flex>
       </div>
 
       <Table
         style={{ overflowX: "auto" }}
         columns={columns}
-        dataSource={data}
+        dataSource={users}
         scroll={{ x: "100%" }}
+        loading={usersLoading}
+        pagination={{
+          pageSize: 10,
+        }}
       ></Table>
 
-      {profileModalOpen && (
-        <ProfileModal open={profileModalOpen} setOpen={setProfileModalOpen} />
+      {profileModalOpen && selectedUser && (
+        <ProfileModal
+          open={profileModalOpen}
+          setOpen={setProfileModalOpen}
+          profile={selectedUser}
+        />
       )}
     </ConfigProvider>
   );

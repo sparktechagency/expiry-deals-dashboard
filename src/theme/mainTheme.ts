@@ -5,6 +5,7 @@ export const mainTheme: ThemeConfig = {
     colorPrimary: "#fb6000",
     colorInfo: "#fb6000",
     fontFamily: "inherit",
+    colorError: "#ff4d4f",
   },
 
   components: {

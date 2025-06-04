@@ -10,36 +10,20 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useState } from "react";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
+import { IDashboardData } from "@/types";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
-const data = [
-  { month: "Jan", user: 120 },
-  { month: "Feb", user: 140 },
-  { month: "Mar", user: 152 },
-  { month: "Apr", user: 122 },
-  { month: "May", user: 153 },
-  { month: "Jun", user: 164 },
-  { month: "Jul", user: 193 },
-  { month: "Aug", user: 134 },
-  { month: "Sep", user: 184 },
-  { month: "Oct", user: 126 },
-  { month: "Nov", user: 164 },
-  { month: "Dec", user: 215 },
-];
+const UsersChart = ({ data }: { data: IDashboardData["monthlyUsers"] }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-const UsersChart = () => {
-  const [, setSelectedYear] = useState("2024");
-
-  const [selectedUserType, setSelectedUserType] = useState("user");
-
-  const handleChange = (value: string) => {
-    setSelectedYear(value);
-  };
-
-  const handleUserChange = (value: string) => {
-    setSelectedUserType(value);
+  const updateSearchParam = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   return (
@@ -49,12 +33,12 @@ const UsersChart = () => {
 
         <div className="flex items-center justify-end gap-x-3">
           <Select
-            value={selectedUserType}
+            value={searchParams?.get("role") || "user"}
             style={{
               width: 120,
               marginLeft: "5px",
             }}
-            onChange={handleUserChange}
+            onChange={(value) => updateSearchParam("role", value)}
             options={[
               { value: "user", label: "User" },
               { value: "vendor", label: "Vendor" },
@@ -63,7 +47,10 @@ const UsersChart = () => {
 
           <DatePicker
             onChange={(_, dateString) =>
-              handleChange(dayjs(dateString as string).format("YYYY"))
+              updateSearchParam(
+                "JoinYear",
+                dayjs(dateString as string).format("YYYY"),
+              )
             }
             picker="year"
             defaultValue={dayjs()}
@@ -115,7 +102,7 @@ const UsersChart = () => {
             barSize={22}
             radius={0}
             background={false}
-            dataKey="user"
+            dataKey="total"
             fill="var(--primary)"
           />
         </BarChart>

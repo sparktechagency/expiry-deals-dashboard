@@ -1,6 +1,11 @@
-export interface IPaginationParams {
-  page: string;
+import { GetProp, UploadProps } from "antd";
+
+export interface IQueryParams {
+  page?: string;
   limit?: string;
+  searchTerm?: string;
+  sort?: string;
+  filter?: string[];
 }
 
 export interface IApiResponseWithMeta<T> {
@@ -16,3 +21,25 @@ export interface IApiResponseWithMeta<T> {
     };
   };
 }
+
+export type TUploadFileType =
+  | "image"
+  | "video"
+  | "audio"
+  | "application/pdf"
+  | "application/msword"
+  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  | "text/plain"
+  | ".jpg"
+  | ".jpeg"
+  | ".png"
+  | ".gif"
+  | ".mp4"
+  | ".mp3"
+  | ".wav"
+  | ".pdf"
+  | ".doc"
+  | ".docx"
+  | ".txt";
+
+export type AntFileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];

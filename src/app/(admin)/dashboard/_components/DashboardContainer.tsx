@@ -5,36 +5,60 @@ import RecentUserTable from "./RecentUserTable";
 import UsersChart from "./UsersChart";
 import { Icon } from "@iconify/react";
 import { Flex } from "antd";
-
-// Dummy data
-const userStats = [
-  {
-    key: "users",
-    label: "Total Users",
-    value: 189,
-    icon: "clarity:users-line",
-  },
-  {
-    key: "vendor",
-    label: "Total Vendors",
-    value: 145,
-    icon: "iconoir:shop",
-  },
-  {
-    key: "revenue",
-    label: "Total Revenue",
-    value: "$4000",
-    icon: "lucide:hand-coins",
-  },
-  {
-    key: "products",
-    label: "Total Products Listed",
-    value: 200,
-    icon: "majesticons:box-line",
-  },
-];
+import { useSearchParams } from "next/navigation";
+import { useGetDashboardDataQuery } from "@/redux/features/earnings/earningsApi";
+import formatCurrency from "@/utils/formatCurrency";
+export interface DashboardDataQueryParams {
+  incomeYear?: string;
+  JoinYear?: string;
+  role?: string;
+}
 
 export default function DashboardContainer() {
+  const searchParams = useSearchParams();
+
+  const query: DashboardDataQueryParams = {};
+  const incomeYear = searchParams?.get("incomeYear") || "";
+  const joinYear = searchParams?.get("JoinYear") || "";
+  const role = searchParams?.get("role") || "user";
+
+  query.incomeYear = incomeYear;
+  query.JoinYear = joinYear;
+  query.role = role;
+
+  const { data: dashboardDataRes, isLoading } = useGetDashboardDataQuery(query);
+  const dashboardData = dashboardDataRes?.data;
+  console.log({ dashboardData });
+
+  const userStats = [
+    {
+      key: "users",
+      label: "Total Users",
+      value: isLoading ? "--" : dashboardData?.totalUsers || "--",
+      icon: "clarity:users-line",
+    },
+    {
+      key: "vendor",
+      label: "Total Vendors",
+      value: isLoading ? "--" : dashboardData?.totalVendor || "--",
+      icon: "iconoir:shop",
+    },
+    {
+      key: "revenue",
+      label: "Total Revenue",
+      value: isLoading
+        ? "--"
+        : formatCurrency(Number(dashboardData?.totalIncome)) || "--",
+      icon: "lucide:hand-coins",
+    },
+    {
+      key: "products",
+      label: "Total Products Listed",
+      value: isLoading ? "--" : dashboardData?.totalProducts || "--",
+      icon: "majesticons:box-line",
+    },
+  ];
+
   return (
     <div className="space-y-10">
       {/* User Stats Section */}
@@ -63,14 +87,20 @@ export default function DashboardContainer() {
       </section>
 
       {/* Charts */}
-      <section className="flex-center-between flex-col gap-10 xl:flex-row">
-        <UsersChart />
-        <EarningChart />
+      <section className="flex-center-between flex-col gap-5 xl:flex-row">
+        {dashboardData?.monthlyUsers && (
+          <UsersChart data={dashboardData?.monthlyUsers} />
+        )}
+        {dashboardData?.monthlyIncome && (
+          <EarningChart data={dashboardData?.monthlyIncome} />
+        )}
       </section>
 
       {/* Recent Users Table */}
       <section>
-        <RecentUserTable />
+        {dashboardData?.userDetails && (
+          <RecentUserTable data={dashboardData?.userDetails} />
+        )}
       </section>
     </div>
   );

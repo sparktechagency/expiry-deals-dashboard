@@ -1,9 +1,7 @@
 "use client";
-import { Icon } from "@iconify/react";
-import { Flex } from "antd";
+import { IDashboardData } from "@/types";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
 import {
   AreaChart,
   Area,
@@ -13,56 +11,30 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
-const data = [
-  { month: "Jan", earning: 1200 },
-  { month: "Feb", earning: 1402 },
-  { month: "Mar", earning: 1525 },
-  { month: "Apr", earning: 1222 },
-  { month: "May", earning: 1553 },
-  { month: "Jun", earning: 1634 },
-  { month: "Jul", earning: 1923 },
-  { month: "Aug", earning: 1324 },
-  { month: "Sep", earning: 1834 },
-  { month: "Oct", earning: 1256 },
-  { month: "Nov", earning: 1634 },
-  { month: "Dec", earning: 2105 },
-];
+const EarningChart = ({ data }: { data: IDashboardData["monthlyIncome"] }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
-const EarningChart = () => {
-  const [, setSelectedYear] = useState("2024");
-
-  const handleChange = (value: string) => {
-    setSelectedYear(value);
+  const updateSearchParam = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+    router.push(`${pathname}?${params.toString()}`);
   };
-
   return (
     <div className="w-full rounded-xl bg-white p-6 xl:w-1/2">
       <div className="mb-10 flex items-center justify-between">
         <h1 className="text-xl font-semibold">Earnings Overview</h1>
 
         <div className="flex-center-start gap-x-4">
-          <Flex
-            align="center"
-            justify="start"
-            className="rounded-lg border border-gray-400 !px-3 !py-[6px]"
-          >
-            <h1 className="font-medium">Monthly Growth:</h1>
-
-            <Flex
-              align="center"
-              justify="start"
-              gap={2}
-              className="ml-2 font-bold text-green-500"
-            >
-              <Icon icon="iconamoon:trend-up-light" height={16} width={16} />{" "}
-              35.80%
-            </Flex>
-          </Flex>
-
           <DatePicker
             onChange={(_, dateString) =>
-              handleChange(dayjs(dateString as string).format("YYYY"))
+              updateSearchParam(
+                "incomeYear",
+                dayjs(dateString as string).format("YYYY"),
+              )
             }
             picker="year"
             defaultValue={dayjs()}
@@ -116,7 +88,7 @@ const EarningChart = () => {
           <Area
             activeDot={{ fill: "var(--primary)" }}
             type="monotone"
-            dataKey="earning"
+            dataKey="income"
             strokeWidth={0}
             stroke="var(--primary)"
             fill="url(#color)"

@@ -2,61 +2,31 @@
 
 import { ConfigProvider, TableProps } from "antd";
 import { Table } from "antd";
-import { UserX } from "lucide-react";
 import { Eye } from "lucide-react";
 import { Filter } from "lucide-react";
-import Image, { StaticImageData } from "next/image";
-import userImage from "@/assets/images/user-avatar-lg.png";
 import { Tooltip } from "antd";
 import { Tag } from "antd";
 import { useState } from "react";
 import getTagColor from "@/utils/getTagColor";
 import ProfileModal from "@/components/shared-modals/ProfileModal";
+import { IDashboardData } from "@/types";
+import CustomAvatar from "@/components/custom/CustomAvatar";
+import dayjs from "dayjs";
 
-interface UserData {
-  key: number;
-  name: string;
-  userImg: StaticImageData;
-  email: string;
-  contact: string;
-  date: string;
-  accountType: "User" | "Vendor";
-}
-
-// Dummy Data
-const data: UserData[] = Array.from({ length: 5 }).map((_, inx) => ({
-  key: inx + 1,
-  name: "Soumaya",
-  userImg: userImage,
-  email: "soumaya@gmail.com",
-  contact: "+1 (234) 567-890",
-  date: "Oct 24 2024, 11:10 PM",
-  accountType: inx % 3 === 0 ? "User" : "Vendor",
-}));
-
-const RecentUserTable = () => {
+const RecentUserTable = ({ data }: { data: IDashboardData["userDetails"] }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<
+    IDashboardData["userDetails"][0] | null
+  >(null);
 
   // =============== Table columns ===============
-  const columns: TableProps<UserData>["columns"] = [
-    {
-      title: "Serial",
-      dataIndex: "key",
-      render: (value) => `#${value}`,
-    },
+  const columns: TableProps<IDashboardData["userDetails"][0]>["columns"] = [
     {
       title: "Name",
-      dataIndex: "name",
-      render: (value, record) => (
+      render: (_, record) => (
         <div className="flex-center-start gap-x-2">
-          <Image
-            src={record.userImg}
-            alt="User avatar"
-            width={40}
-            height={40}
-            className="aspect-square rounded-full"
-          />
-          <p className="font-medium">{value}</p>
+          <CustomAvatar src={record?.profile} name={record?.name} size={30} />
+          <p className="font-medium">{record?.name}</p>
         </div>
       ),
     },
@@ -66,15 +36,17 @@ const RecentUserTable = () => {
     },
     {
       title: "Contact",
-      dataIndex: "contact",
+      dataIndex: "phoneNumber",
+      render: (value) => value || "--",
     },
     {
-      title: "Date",
-      dataIndex: "date",
+      title: "Registered At",
+      dataIndex: "createdAt",
+      render: (value) => dayjs(value).format("DD-MM-YYYY"),
     },
     {
       title: "Account Type",
-      dataIndex: "accountType",
+      dataIndex: "role",
 
       filters: [
         {
@@ -93,27 +65,23 @@ const RecentUserTable = () => {
           className="flex items-start justify-start"
         />
       ),
-      onFilter: (value, record) =>
-        record.accountType.indexOf(value as string) === 0,
+      onFilter: (value, record) => record.role.indexOf(value as string) === 0,
 
       render: (value) => <Tag color={getTagColor(value)}>{value}</Tag>,
     },
     {
       title: "Action",
-      render: () => (
-        <div className="flex-center-start gap-x-3">
-          <Tooltip title="Show Details">
-            <button onClick={() => setShowProfileModal(true)}>
-              <Eye color="#1B70A6" size={22} />
-            </button>
-          </Tooltip>
-
-          <Tooltip title="Block User">
-            <button>
-              <UserX color="#F16365" size={22} />
-            </button>
-          </Tooltip>
-        </div>
+      render: (_, record) => (
+        <Tooltip title="Show Details">
+          <button
+            onClick={() => {
+              setShowProfileModal(true);
+              setSelectedUser(record);
+            }}
+          >
+            <Eye color="var(--primary)" size={22} />
+          </button>
+        </Tooltip>
       ),
     },
   ];
@@ -133,13 +101,20 @@ const RecentUserTable = () => {
         <Table
           style={{ overflowX: "auto" }}
           columns={columns}
-          dataSource={data}
+          dataSource={data ? data?.slice(0, 5) : []}
           scroll={{ x: "100%" }}
+          pagination={false}
         ></Table>
       </div>
 
       {/* Profile Modal */}
-      <ProfileModal open={showProfileModal} setOpen={setShowProfileModal} />
+      {showProfileModal && selectedUser && (
+        <ProfileModal
+          open={showProfileModal}
+          setOpen={setShowProfileModal}
+          profile={selectedUser}
+        />
+      )}
     </ConfigProvider>
   );
 };

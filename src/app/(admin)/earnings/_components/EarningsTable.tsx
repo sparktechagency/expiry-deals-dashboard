@@ -1,94 +1,63 @@
 "use client";
 
-import { Button, Col, Flex, Row, TableProps } from "antd";
+import { Col, Flex, Row, Table, TableProps } from "antd";
 import { Tag } from "antd";
-import { Table } from "antd";
-import { Filter } from "lucide-react";
+import { Copy, Filter } from "lucide-react";
 import { Input } from "antd";
 import { Icon } from "@iconify/react";
-import { DatePicker } from "antd";
-const { Search } = Input;
-import userImg from "@/assets/images/user-avatar.png";
-import { Image } from "antd";
+// import { DatePicker } from "antd";
 import { formatString } from "@/utils/formatString";
 import { useState } from "react";
+import { useGetAllEarningsQuery } from "@/redux/features/earnings/earningsApi";
+import { IEarning } from "@/types";
+import formatCurrency from "@/utils/formatCurrency";
+import dayjs from "dayjs";
+import CustomAvatar from "@/components/custom/CustomAvatar";
+import copyToClipboard from "@/utils/copyToClipboard";
 import getTagColor from "@/utils/getTagColor";
-import { StaticImageData } from "next/image";
-
-interface EarningsTableData {
-  id: string;
-  guest: {
-    name: string;
-    img: StaticImageData;
-  };
-  amount: string;
-  status: string;
-  tnxId: string;
-  date: string;
-  accountType: string;
-}
-
-// Dummy Data
-const data: EarningsTableData[] = Array.from({ length: 20 }).map((_, inx) => ({
-  id: "INV0938",
-  guest: {
-    name: "Sarah Johnson",
-    img: userImg,
-  },
-  amount: "499",
-  status: "Paid",
-  tnxId: "454842343454",
-  date: "Aug, 15 2023 02:29 PM",
-  accountType: inx % 2 === 0 ? "User" : "Vendor",
-}));
+const { Search } = Input;
 
 export default function EarningsTable() {
   const [showFormattedTnxId, setShowFormattedTnxId] = useState(true);
+  const [searchText, setSearchText] = useState("");
+
+  // Get earnings data
+  const { data: earningsRes, isLoading: earningsLoading } =
+    useGetAllEarningsQuery({
+      limit: "99999",
+      searchTerm: searchText,
+    });
+  const earnings = earningsRes?.data;
+  const earningsTableData: IEarning[] = earnings?.allData || [];
 
   // ---------------- Table columns ----------------
-  const columns: TableProps<EarningsTableData>["columns"] = [
-    {
-      title: "Invoice Id",
-      dataIndex: "id",
-      render: (value) => `#${value}`,
-    },
+  const columns: TableProps<IEarning>["columns"] = [
     {
       title: "Paid By",
-      dataIndex: "guest",
+      dataIndex: "user",
       render: (value) => {
         return (
-          <Flex align="center" justify="start" gap={8}>
-            <Image
-              src={value.img.src}
-              alt={value.name}
-              height={30}
-              width={30}
-              className="aspect-square rounded-full object-cover"
-            />
-            <p>{value.name}</p>
+          <Flex align="center" justify="start" gap={12}>
+            <CustomAvatar src={value?.profile} name={value?.name} size={40} />
+            <div>
+              <p>{value?.name}</p>
+              <p className="text-sm text-gray-500">{value?.email}</p>
+            </div>
           </Flex>
         );
       },
     },
     {
-      title: "Amount",
-      dataIndex: "amount",
-      render: (value) => {
-        return "$" + value;
-      },
-    },
-    {
       title: "Status",
       dataIndex: "status",
-
       filters: [
         {
           text: "Paid",
-          value: "Paid",
+          value: "paid",
         },
         {
           text: "Unpaid",
-          value: "Unpaid",
+          value: "unpaid",
         },
       ],
       filterIcon: () => (
@@ -98,45 +67,48 @@ export default function EarningsTable() {
           className="flex items-start justify-start"
         />
       ),
-      onFilter: (value, record) => record.status.indexOf(value as string) === 0,
+      onFilter: (value, record) =>
+        record?.status?.indexOf(value as string) === 0,
       render: (value) => (
-        <Tag color="green" className="!text-sm">
+        <Tag
+          color={getTagColor(value?.toLowerCase())}
+          className="!text-sm capitalize"
+        >
           {value}
         </Tag>
       ),
     },
-
     {
-      title: "Tnx Id",
-      dataIndex: "tnxId",
+      title: "Amount",
+      dataIndex: "price",
+      render: (value) => formatCurrency(Number(value)),
+    },
+    {
+      title: "Transaction Id",
+      dataIndex: "trnId",
       render: (value) => (
-        <Tag
-          color="magenta"
-          className="cursor-pointer !text-sm"
-          onClick={() => setShowFormattedTnxId(!showFormattedTnxId)}
-          role="button"
-        >
-          {showFormattedTnxId ? formatString.formatTransactionId(value) : value}
-        </Tag>
+        <Flex>
+          <Tag
+            color="magenta"
+            className="cursor-pointer !text-sm"
+            onClick={() => setShowFormattedTnxId(!showFormattedTnxId)}
+            role="button"
+          >
+            {showFormattedTnxId
+              ? formatString.formatTransactionId(value)
+              : value}
+          </Tag>
+
+          <button onClick={() => copyToClipboard(value)}>
+            <Copy size={16} className="text-primary hover:text-primary/70" />
+          </button>
+        </Flex>
       ),
     },
     {
-      title: "Account Type",
-      dataIndex: "accountType",
-      render: (value) => {
-        return <Tag color={getTagColor(value)}>{value}</Tag>;
-      },
-    },
-    {
       title: "Date",
-      dataIndex: "date",
-    },
-
-    {
-      title: "Action",
-      render: () => {
-        return <Button type="primary">View Details</Button>;
-      },
+      dataIndex: "createdAt",
+      render: (value) => dayjs(value).format("DD-MM-YYYY, hh:mm A"),
     },
   ];
 
@@ -148,7 +120,7 @@ export default function EarningsTable() {
         <Flex justify="end" gap={10} align="center" className="h-full w-1/3">
           <Search
             placeholder="Search Earnings..."
-            onSearch={(value) => console.log(value)}
+            onSearch={(value) => setSearchText(value)}
             size="large"
             style={{
               width: 300,
@@ -156,13 +128,13 @@ export default function EarningsTable() {
             allowClear
           />
 
-          <Flex justify="end" gap={14} align="center" className="h-16 w-max">
+          {/* <Flex justify="end" gap={14} align="center" className="h-16 w-max">
             <DatePicker
               picker="month"
               placeholder="Filter Month"
               style={{ height: "65%" }}
             />
-          </Flex>
+          </Flex> */}
         </Flex>
       </Flex>
 
@@ -178,7 +150,9 @@ export default function EarningsTable() {
 
             <Flex align="center" gap={10}>
               <h4 className="text-lg font-semibold">Today&apos;s Earnings</h4>
-              <h4 className="text-lg font-bold">$ 1,000</h4>
+              <h4 className="text-lg font-bold">
+                {formatCurrency(Number(earnings?.todayEarnings))}
+              </h4>
             </Flex>
           </Flex>
         </Col>
@@ -194,7 +168,9 @@ export default function EarningsTable() {
 
             <Flex align="center" gap={10}>
               <h4 className="text-lg font-semibold">Total Earnings</h4>
-              <h4 className="text-lg font-bold">$ 10,000</h4>
+              <h4 className="text-lg font-bold">
+                {formatCurrency(Number(earnings?.totalEarnings))}
+              </h4>
             </Flex>
           </Flex>
         </Col>
@@ -204,11 +180,11 @@ export default function EarningsTable() {
         <Table
           style={{ overflowX: "auto" }}
           columns={columns}
-          dataSource={data}
+          dataSource={earningsTableData}
+          loading={earningsLoading}
           scroll={{ x: "100%" }}
-          className="notranslate"
           pagination={{
-            pageSize: 15,
+            pageSize: 10,
           }}
         ></Table>
       </div>

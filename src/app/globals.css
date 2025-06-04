@@ -137,3 +137,7 @@ body {
   transition: none !important;
   font-size: 1.2rem !important;
 }
+
+button {
+  @apply cursor-pointer;
+}

@@ -44,15 +44,15 @@ const sidebarLinks = [
     label: "Withdraw Requests",
   },
   {
-    id: "product-category",
+    id: "categories",
     icon: "ri:box-3-line",
-    route: "/product-category",
+    route: "/categories",
     label: "Product Categories",
   },
   {
     id: "settings",
     icon: "si:settings-fill",
-    route: "/admin/settings",
+    route: "/settings",
     label: "Settings",
   },
 ];
