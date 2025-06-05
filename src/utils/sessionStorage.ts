@@ -10,7 +10,9 @@ export const getFromSessionStorage = (key: string) => {
     return;
   }
 
-  return JSON.parse(sessionStorage.getItem(key)!);
+  return sessionStorage?.getItem(key)
+    ? JSON.parse(sessionStorage.getItem(key)!)
+    : null;
 };
 
 export const removeFromSessionStorage = (key: string) => {

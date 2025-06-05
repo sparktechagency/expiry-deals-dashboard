@@ -18,6 +18,8 @@ const baseQuery = fetchBaseQuery({
   baseUrl: envConfig.backendBaseUrl,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
+    const forgotPassToken = getFromSessionStorage("forgotPassToken");
+    const changePassToken = getFromSessionStorage("changePassToken");
     const otpToken = getFromSessionStorage("token");
     const token = (getState() as RootState).auth.token;
 
@@ -26,6 +28,12 @@ const baseQuery = fetchBaseQuery({
     }
     if (otpToken) {
       headers.set("token", otpToken);
+    }
+    if (forgotPassToken) {
+      headers.set("token", forgotPassToken);
+    }
+    if (changePassToken) {
+      headers.set("token", changePassToken);
     }
 
     return headers;
@@ -45,15 +53,11 @@ const baseQueryWithRefreshToken: BaseQueryFn<
     toast.error((result.error.data as any).message);
   }
   if (result?.error?.status === 401) {
-
     //* Send Refresh
-    const res = await fetch(
-      `${envConfig.backendBaseUrl}/auth/refresh-token`,
-      {
-        method: "POST",
-        credentials: "include",
-      }
-    );
+    const res = await fetch(`${envConfig.backendBaseUrl}/auth/refresh-token`, {
+      method: "POST",
+      credentials: "include",
+    });
 
     const data = await res.json();
     if (data?.data?.accessToken) {
@@ -63,7 +67,7 @@ const baseQueryWithRefreshToken: BaseQueryFn<
         setUser({
           user,
           token: data.data.accessToken,
-        })
+        }),
       );
 
       result = await baseQuery(args, api, extraOptions);
