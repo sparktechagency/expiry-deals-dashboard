@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { tagTypes } from "../../../types/tagTypes";
+import { tagTypes } from "@/redux/tagTypes";
 import { baseApi } from "../../api/baseApi";
 
 const otpApi = baseApi.injectEndpoints({

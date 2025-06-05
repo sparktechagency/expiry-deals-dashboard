@@ -1,4 +1,5 @@
 export const tagTypes = {
+  otp: "Otp",
   users: "Users",
   user: "User",
   vendorRequests: "VendorRequests",
