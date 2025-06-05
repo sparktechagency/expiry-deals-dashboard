@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "antd";
+import { Button, Flex } from "antd";
 import "./HeaderContainer.css";
 import Link from "next/link";
 import { Layout } from "antd";
@@ -108,10 +108,16 @@ export default function HeaderContainer() {
 
         {/* User */}
         <Link
-          href={"/admin/profile"}
+          href={"/profile"}
           className="hover:text-primary-blue group flex items-center gap-x-2 text-black"
         >
-          <CustomAvatar src={myProfile?.profile} size={50} />
+          <Flex align="center" gap={8}>
+            <CustomAvatar src={myProfile?.profile} size={50} />
+
+            <p className="hover:!text-primary text-base font-semibold !text-black transition-colors">
+              {myProfile?.name}
+            </p>
+          </Flex>
         </Link>
       </div>
     </Header>

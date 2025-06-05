@@ -67,7 +67,11 @@ const RecentUserTable = ({ data }: { data: IDashboardData["userDetails"] }) => {
       ),
       onFilter: (value, record) => record.role.indexOf(value as string) === 0,
 
-      render: (value) => <Tag color={getTagColor(value)}>{value}</Tag>,
+      render: (value) => (
+        <Tag color={getTagColor(value)} className="capitalize">
+          {value}
+        </Tag>
+      ),
     },
     {
       title: "Action",

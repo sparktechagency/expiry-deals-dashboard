@@ -1,20 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import FormWrapper from "@/components/Form/FormWrapper";
-import UTextEditor from "@/components/Form/UTextEditor";
-import useSettingApi from "@/hooks/api/useSettingApi";
-import { useUpdateSettingsDataMutation } from "@/redux/api/settingsApi";
+import FormWrapper from "@/components/form-components/FormWrapper";
+import UTextEditor from "@/components/form-components/UTextEditor";
+import {
+  useGetSettingsDataQuery,
+  useUpdateSettingsDataMutation,
+} from "@/redux/features/settings/settingsApi";
 import catchAsync from "@/utils/catchAsync";
 import { Button } from "antd";
 import { Edit } from "lucide-react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export default function TermsConditionsContainer() {
-  const { terms_conditions } = useSettingApi();
+  const { data } = useGetSettingsDataQuery({});
 
   const [updateFn, { isLoading }] = useUpdateSettingsDataMutation();
 
-  const handleSubmit = (data) => {
+  const handleSubmit = (data: any) => {
     catchAsync(async () => {
       await updateFn(data).unwrap();
       toast.success("Terms and Conditions Updated Successfully");
@@ -24,9 +27,12 @@ export default function TermsConditionsContainer() {
     <section>
       <h3 className="mb-6 text-2xl font-semibold">Terms and Conditions</h3>
 
-      <FormWrapper onSubmit={handleSubmit} defaultValues={{ terms_conditions }}>
+      <FormWrapper
+        onSubmit={handleSubmit}
+        defaultValues={{ termsAndConditions: data?.termsAndConditions }}
+      >
         <UTextEditor
-          name="terms_conditions"
+          name="termsAndConditions"
           placeholder="Note: Enter details about your terms and conditions here."
         />
 
