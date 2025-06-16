@@ -26,6 +26,7 @@ const { Search } = Input;
 export default function VendorRequestsTable() {
   const [showRequestDetailsModal, setShowRequestDetailsModal] =
     useState<boolean>(false);
+  const [modalData, setModalData] = useState({});
   const searchParams = useSearchParams();
 
   const query = {
@@ -133,7 +134,11 @@ export default function VendorRequestsTable() {
       render: (value) => (
         <div className="flex-center-start gap-x-3">
           <Tooltip title="Show Details">
-            <button onClick={() => setShowRequestDetailsModal(true)}>
+            <button
+              onClick={() => {
+                setShowRequestDetailsModal(true), setModalData(value);
+              }}
+            >
               <Eye color="var(--primary)" size={22} />
             </button>
           </Tooltip>
@@ -217,6 +222,7 @@ export default function VendorRequestsTable() {
       {/* Modals */}
       {showRequestDetailsModal && (
         <VendorRequestModal
+          modalData={modalData}
           open={showRequestDetailsModal}
           setOpen={setShowRequestDetailsModal}
         />

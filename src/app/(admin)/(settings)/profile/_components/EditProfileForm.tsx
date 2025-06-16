@@ -19,11 +19,8 @@ export default function EditProfileForm({ myProfile }: EditProfileFormProps) {
   console.log(myProfile);
   const [editProfile, { isLoading: isUpdating }] = useUpdateMyProfileMutation();
   const handleSubmit = (data: any) => {
-    const formData = new FormData();
-    formData.append("payload", JSON.stringify(data));
-
     catchAsync(async () => {
-      await editProfile(formData).unwrap();
+      await editProfile(data).unwrap();
       toast.success("Profile Updated Successfully");
     });
   };
