@@ -21,12 +21,16 @@ import { useSearchParams } from "next/navigation";
 import { IVendorRequest } from "@/types/vendorRequest.type";
 import dayjs from "dayjs";
 import { toast } from "sonner";
+import RejectRequestModal from "./RejectRequestModal";
 const { Search } = Input;
 
 export default function VendorRequestsTable() {
   const [showRequestDetailsModal, setShowRequestDetailsModal] =
     useState<boolean>(false);
+  const [showRequestRejectModal, setShowRequestRejectModal] =
+    useState<boolean>(false);
   const [modalData, setModalData] = useState({});
+  const [requestId, setRequestId] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   const query = {
@@ -48,10 +52,17 @@ export default function VendorRequestsTable() {
   const [approveRequest] = useApproveVendorRequestMutation();
   const [rejectRequest] = useRejectVendorRequestMutation();
 
-  const handleRejectRequest = async (requestId: string) => {
+  const handleRejectRequest = async (
+    requestId: string,
+    data: { reason: string },
+  ) => {
+    console.log(data);
     const toastId = toast.loading("Processing...");
     try {
-      await rejectRequest(requestId).unwrap();
+      await rejectRequest({
+        id: requestId,
+        payload: data,
+      }).unwrap();
       toast.success("Request Rejected Successfully!", {
         id: toastId,
       });
@@ -163,24 +174,32 @@ export default function VendorRequestsTable() {
             </Tooltip>
           </CustomConfirm>
 
-          <CustomConfirm
+          <Tooltip title="Reject Modal">
+            <button
+              onClick={() => {
+                setShowRequestRejectModal(true), setRequestId(value?._id);
+              }}
+            >
+              <Icon
+                color="#F16365"
+                height={22}
+                width={22}
+                icon="charm:circle-cross"
+              />
+            </button>
+          </Tooltip>
+
+          {/* <CustomConfirm
             title="Reject Request"
             description="Are you sure to reject this request?"
-            onConfirm={() => handleRejectRequest(value?._id)}
+            onConfirm={() => handleRejectRequest()}
           >
             <Tooltip title="Reject Request">
               <button>
-                <Icon
-                  color="#F16365"
-                  height={22}
-                  width={22}
-                  icon="charm:circle-cross"
-                />
-
                 <div className="sr-only">Reject request</div>
               </button>
             </Tooltip>
-          </CustomConfirm>
+          </CustomConfirm> */}
         </div>
       ),
     },
@@ -225,6 +244,14 @@ export default function VendorRequestsTable() {
           modalData={modalData}
           open={showRequestDetailsModal}
           setOpen={setShowRequestDetailsModal}
+        />
+      )}
+      {requestId && (
+        <RejectRequestModal
+          handleRejectRequest={handleRejectRequest}
+          requestId={requestId}
+          open={showRequestRejectModal}
+          setOpen={setShowRequestRejectModal}
         />
       )}
     </div>

@@ -29,10 +29,13 @@ const vendorRequestApi = baseApi.injectEndpoints({
     }),
 
     rejectVendorRequest: builder.mutation({
-      query: (requestId) => ({
-        url: `/vendor-request/reject/${requestId}`,
-        method: "PATCH",
-      }),
+      query: (data) => {
+        return {
+          url: `/vendor-request/reject/${data.id}`,
+          method: "PATCH",
+          body: data.payload,
+        };
+      },
 
       invalidatesTags: [tagTypes.vendorRequests],
     }),

@@ -1,10 +1,11 @@
 "use client";
 
+import CustomConfirm from "@/components/custom/CustomConfirm";
 import FormWrapper from "@/components/form-components/FormWrapper";
 import UTextArea from "@/components/form-components/UTextArea";
 import { IWithdrawRequest } from "@/types/withdrawRequest.type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Modal } from "antd";
+import { Button, Modal, Tooltip } from "antd";
 import { z } from "zod";
 
 interface RejectionRequestModalProps {
@@ -43,6 +44,7 @@ export default function RejectionRequestModal({
           placeholder="Tell vendor why their withdrawal request was rejected..."
           required
         />
+
         <Button
           htmlType="submit"
           type="primary"
