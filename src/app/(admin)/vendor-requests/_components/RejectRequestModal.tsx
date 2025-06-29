@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import FormWrapper from "@/components/form-components/FormWrapper";
 import UTextArea from "@/components/form-components/UTextArea";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +8,7 @@ import z from "zod";
 
 interface VendorRequestRejectModalProps {
   requestId: string;
-  handleRejectRequest: Function;
+  handleRejectRequest: any;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }

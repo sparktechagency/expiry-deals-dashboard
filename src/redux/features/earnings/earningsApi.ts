@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { tagTypes } from "@/redux/tagTypes";
 import { baseApi } from "@/redux/api/baseApi";
 import { IDashboardData, IEarnings, IQueryParams } from "@/types";

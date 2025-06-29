@@ -146,9 +146,7 @@ export default function VendorRequestsTable() {
         <div className="flex-center-start gap-x-3">
           <Tooltip title="Show Details">
             <button
-              onClick={() => {
-                setShowRequestDetailsModal(true), setModalData(value);
-              }}
+              onClick={() =>{ setShowRequestDetailsModal(true); setModalData(value)}}
             >
               <Eye color="var(--primary)" size={22} />
             </button>
@@ -177,7 +175,7 @@ export default function VendorRequestsTable() {
           <Tooltip title="Reject Modal">
             <button
               onClick={() => {
-                setShowRequestRejectModal(true), setRequestId(value?._id);
+                setShowRequestRejectModal(true); setRequestId(value?._id);
               }}
             >
               <Icon

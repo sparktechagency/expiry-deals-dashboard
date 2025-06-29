@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { tagTypes } from "@/redux/tagTypes";
 import { baseApi } from "@/redux/api/baseApi";
 import { IApiResponseWithMeta, IQueryParams } from "@/types";
@@ -6,10 +6,8 @@ import { IVendorRequest } from "@/types/vendorRequest.type";
 
 const vendorRequestApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllVendorRequests: builder.query<
-      IApiResponseWithMeta<IVendorRequest[]>,
-      IQueryParams
-    >({
+    getAllVendorRequests: builder.query<IApiResponseWithMeta<IVendorRequest[]>,IQueryParams >
+    ({
       query: (params) => ({
         url: "/vendor-request",
         method: "GET",

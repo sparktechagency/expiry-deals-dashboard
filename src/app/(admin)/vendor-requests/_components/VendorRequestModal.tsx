@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomAvatar from "@/components/custom/CustomAvatar";
 import getTagColor from "@/utils/getTagColor";
 import { Modal, Tag } from "antd";
