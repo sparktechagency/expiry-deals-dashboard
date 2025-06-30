@@ -15,7 +15,7 @@ export default function ProfileContainer() {
 
   const { data: myProfileRes, isLoading } = useGetProfileQuery();
   const myProfile = myProfileRes?.data;
-  console.log({ myProfile });
+ 
 
   const tabItems = [
     {

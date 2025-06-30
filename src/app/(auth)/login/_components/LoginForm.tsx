@@ -27,8 +27,7 @@ export default function LoginForm() {
 
   const onLoginSubmit: SubmitHandler<IFormValues> = async (data) => {
     await catchAsync(async () => {
-      const res = await signIn(data).unwrap();
-      //   return console.log({ res });
+      const res = await signIn(data).unwrap(); 
 
       dispatch(
         setUser({

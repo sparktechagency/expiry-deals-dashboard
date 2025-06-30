@@ -28,7 +28,7 @@ export default function DashboardContainer() {
 
   const { data: dashboardDataRes, isLoading } = useGetDashboardDataQuery(query);
   const dashboardData = dashboardDataRes?.data;
-  console.log({ dashboardData });
+  
 
   const userStats = [
     {

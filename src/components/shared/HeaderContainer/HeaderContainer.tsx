@@ -56,7 +56,7 @@ export default function HeaderContainer() {
 
   const { data: myProfileRes } = useGetProfileQuery();
   const myProfile = myProfileRes?.data;
-  console.log({ myProfile });
+ 
 
   return (
     <Header

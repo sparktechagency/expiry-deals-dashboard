@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 export default function PrivacyPolicyContainer() {
   const { data } = useGetSettingsDataQuery({});
-  console.log({ data });
+  
 
   const [updateFn, { isLoading }] = useUpdateSettingsDataMutation();
 

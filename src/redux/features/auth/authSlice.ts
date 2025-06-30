@@ -1,6 +1,7 @@
  
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
+import Cookies from "js-cookie"; 
 
 export type TUser = {
   userId: string;
@@ -27,10 +28,17 @@ const authSlice = createSlice({
       const { user, token } = action.payload;
       state.user = user;
       state.token = token;
+      
+      // Set token for cookies
+      Cookies.set("expire-deals-token", token, {path:"/"})
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
+      
+      // Remove token for cookies
+      Cookies.remove("expire-deals-token", { path: "/" });
+     
     },
   },
 });

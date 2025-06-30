@@ -16,7 +16,7 @@ interface EditProfileFormProps {
 }
 
 export default function EditProfileForm({ myProfile }: EditProfileFormProps) {
-  console.log(myProfile);
+ 
   const [editProfile, { isLoading: isUpdating }] = useUpdateMyProfileMutation();
   const handleSubmit = (data: any) => {
     catchAsync(async () => {

@@ -2,14 +2,17 @@
 
 import "./Sidebar.css";
 import { MainLayoutContext } from "@/context/MainLayoutContext";
+import { logout } from "@/redux/features/auth/authSlice";
 // import { cn } from "@/utils/cn";
 import { Icon } from "@iconify/react";
 import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 // import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation"; 
 import React, { useContext } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 // Sidebar Links
 const sidebarLinks = [
@@ -60,20 +63,19 @@ const sidebarLinks = [
 const SidebarContainer = () => {
   const { sidebarCollapsed: collapsed } = useContext(MainLayoutContext);
 
-  // const dispatch = useDispatch();
-  // const router = useRouter();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   // Logout handler
-  const onClick = () => {
-    // if (e.key === "logout") {
-    //   dispatch(logout());
-    //   router.refresh();
-    //   router.push("/login");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onClick = (e:any) => {
+    if (e.key === "logout") {
+      dispatch(logout());
+      router.refresh();
+      router.push("/login");
 
-    //   Success_model({ title: "Logout successful" });
-    // }
-
-    console.log("logout success");
+       toast.success("Logout successful");
+    } 
   };
 
   // Admin Sidebar Links

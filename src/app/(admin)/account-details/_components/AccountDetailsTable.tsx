@@ -34,7 +34,7 @@ export default function AccountDetailsTable() {
     searchTerm: searchText,
   });
   const users = usersRes?.data?.data || [];
-  console.log({ users });
+ 
 
   // User status update handle
   const [toggleUserStatus] = useToggleUserStatusMutation();

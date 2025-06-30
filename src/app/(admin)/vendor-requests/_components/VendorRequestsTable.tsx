@@ -25,6 +25,7 @@ import RejectRequestModal from "./RejectRequestModal";
 const { Search } = Input;
 
 export default function VendorRequestsTable() {
+  const [search, setSearch] = useState<string | null>(null)
   const [showRequestDetailsModal, setShowRequestDetailsModal] =
     useState<boolean>(false);
   const [showRequestRejectModal, setShowRequestRejectModal] =
@@ -33,7 +34,7 @@ export default function VendorRequestsTable() {
   const [requestId, setRequestId] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
-  const query = {
+  const query:Record<string, any> = {
     page: "1",
     limit: "10",
   };
@@ -42,6 +43,9 @@ export default function VendorRequestsTable() {
 
   query["page"] = page;
   query["limit"] = limit;
+  if(search){
+    query["searchTerm"] = search;
+  }
 
   // Get all vendor requests
   const { data: vendorRequestsRes, isLoading: vendorRequestsLoading } =
@@ -55,8 +59,7 @@ export default function VendorRequestsTable() {
   const handleRejectRequest = async (
     requestId: string,
     data: { reason: string },
-  ) => {
-    console.log(data);
+  ) => { 
     const toastId = toast.loading("Processing...");
     try {
       await rejectRequest({
@@ -185,19 +188,7 @@ export default function VendorRequestsTable() {
                 icon="charm:circle-cross"
               />
             </button>
-          </Tooltip>
-
-          {/* <CustomConfirm
-            title="Reject Request"
-            description="Are you sure to reject this request?"
-            onConfirm={() => handleRejectRequest()}
-          >
-            <Tooltip title="Reject Request">
-              <button>
-                <div className="sr-only">Reject request</div>
-              </button>
-            </Tooltip>
-          </CustomConfirm> */}
+          </Tooltip> 
         </div>
       ),
     },
@@ -213,7 +204,7 @@ export default function VendorRequestsTable() {
         <Flex justify="end" gap={10} align="center" className="h-full w-1/3">
           <Search
             placeholder="Search vendors by mail..."
-            onSearch={(value) => console.log(value)}
+            onSearch={(value) => setSearch(value)}
             size="large"
             style={{
               width: 300,
