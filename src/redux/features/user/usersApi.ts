@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { tagTypes } from "@/redux/tagTypes";
 import { baseApi } from "../../api/baseApi";
 import { IApiResponseWithMeta, IUser, IQueryParams, IMyProfile } from "@/types";
